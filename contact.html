@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEXUS STUDIOS | Contact</title>
+    <title>NAUFAL STUDIOS | Contact</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -104,51 +104,61 @@
         <p class="section-subtitle">Ada pertanyaan atau ingin berkolaborasi? Hubungi kami!</p>
 
         <div class="contact-grid">
-            <a href="https://wa.me/6281234567890" target="_blank" class="contact-card">
-                <i class="fab fa-whatsapp"></i>
-                <h3>WhatsApp</h3>
-                <p>Chat langsung dengan kami</p>
-            </a>
-            <a href="https://instagram.com/username" target="_blank" class="contact-card">
+ 
+            <a href="https://www.instagram.com/nopallz.__?igsh=dTgxOXdkdzdjZ2xm" target="_blank" class="contact-card">
                 <i class="fab fa-instagram"></i>
                 <h3>Instagram</h3>
                 <p>Follow untuk update terbaru</p>
             </a>
-            <a href="mailto:email@example.com" class="contact-card">
+            <a href="mailto:muhammadnaufalpanggang@gmail.com" class="contact-card">
                 <i class="fas fa-envelope"></i>
                 <h3>Email</h3>
                 <p>Kirim pesan via email</p>
             </a>
         </div>
 
-        <div class="form-section">
-            <h2>Kirim Pesan</h2>
-            <form id="contactForm">
-                <div class="form-group">
-                    <label>Nama</label>
-                    <input type="text" placeholder="Nama kamu..." required>
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" placeholder="email@example.com" required>
-                </div>
-                <div class="form-group">
-                    <label>Pesan</label>
-                    <textarea placeholder="Tulis pesan kamu di sini..." required></textarea>
-                </div>
-                <button type="submit" class="submit-btn">KIRIM PESAN <i class="fas fa-paper-plane"></i></button>
-            </form>
+       <div class="form-section">
+    <h2>Kirim Pesan via WhatsApp</h2>
+    <form id="waForm">
+        <div class="form-group">
+            <label>Nama Kamu</label>
+            <input type="text" id="waName" placeholder="Contoh: Budi" required>
         </div>
+        
+        <div class="form-group">
+            <label>Pesan</label>
+            <textarea id="waMessage" placeholder="Tulis pesan kamu di sini..." required></textarea>
+        </div>
+
+        <!-- Tombol Kirim -->
+        <button type="submit" class="submit-btn">
+            KIRIM KE WHATSAPP <i class="fab fa-whatsapp"></i>
+        </button>
+    </form>
+</div>
+
+<script>
+    document.getElementById('waForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // Mencegah reload halaman
+
+        // 1. GANTI NOMOR INI DENGAN NOMOR KAMU (Gunakan kode negara 62)
+        const nomorHP = "6282218897217"; 
+
+        // 2. Ambil data dari inputan
+        const nama = document.getElementById('waName').value;
+        const pesan = document.getElementById('waMessage').value;
+
+        // 3. Buat format pesan rapi
+        const text = `Halo Naufal, saya ${nama}.%0A%0A${pesan}`;
+
+        // 4. Buka WhatsApp otomatis
+        window.open(`https://wa.me/${nomorHP}?text=${text}`, '_blank');
+    });
+</script>
+
     </div>
 
     <footer>&copy; 2026 Naufal Studios. All rights reserved.</footer>
 
-    <script>
-        document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            alert('Pesan berhasil dikirim! Terima kasih telah menghubungi kami.');
-            this.reset();
-        });
-    </script>
 </body>
 </html>
