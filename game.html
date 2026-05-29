@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS STUDIOS | Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #050505; --primary: #00f3ff; --secondary: #7000ff;
+            --text-main: #ffffff; --text-muted: #8b9bb4;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: 'Rajdhani', sans-serif; }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+        a { text-decoration: none; color: white; transition: 0.3s; }
+
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0,243,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px; z-index: -1;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
+        }
+
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5,5,5,0.85); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
+        }
+        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; cursor: pointer; }
+        .logo span { color: var(--primary); }
+        .nav-links { display: flex; gap: 25px; }
+        .nav-links a {
+            color: var(--text-muted); font-weight: 600; padding: 5px 10px; border-radius: 4px; transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
+
+        .page-content { padding: 120px 5% 80px; min-height: 100vh; }
+
+        .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 60px; }
+        .section-title::after {
+            content: ''; display: block; width: 100px; height: 4px; background: var(--primary);
+            margin: 15px auto 0; box-shadow: 0 0 10px var(--primary);
+        }
+
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; max-width: 1200px; margin: 0 auto; }
+
+        .game-card {
+            background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px; overflow: hidden; transition: 0.4s;
+        }
+        .game-card:hover { border-color: var(--primary); transform: translateY(-8px); box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+
+        .card-img { width: 100%; height: 220px; object-fit: cover; }
+
+        .card-body { padding: 25px; }
+        .card-tag {
+            display: inline-block; background: var(--gradient); padding: 4px 12px;
+            font-size: 0.75rem; font-weight: bold; border-radius: 4px; margin-bottom: 12px;
+        }
+        .card-body h3 { font-size: 1.4rem; margin-bottom: 10px; }
+        .card-body p { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.6; }
+
+        .play-btn {
+            display: inline-flex; align-items: center; gap: 8px; padding: 10px 25px;
+            border: 1px solid var(--primary); color: var(--primary); font-weight: bold;
+            border-radius: 6px; transition: 0.3s;
+        }
+        .play-btn:hover { background: var(--primary); color: black; box-shadow: 0 0 20px rgba(0,243,255,0.3); }
+
+        .coming-soon { opacity: 0.5; pointer-events: none; border-color: #333; }
+        .coming-soon .play-btn { border-color: #555; color: #555; }
+
+        footer { text-align: center; padding: 30px; color: #333; font-size: 0.8rem; border-top: 1px solid rgba(255,255,255,0.05); }
+
+        @media (max-width: 768px) {
+            .section-title { font-size: 1.8rem; }
+            .nav-links { gap: 10px; }
+            .nav-links a { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <nav>
+        <div class="logo" onclick="window.location='index.html'">NEXUS <span>STUDIOS</span></div>
+        <div class="nav-links">
+            <a href="index.html">HOME</a>
+            <a href="games.html" class="active">GAMES</a>
+            <a href="creator.html">CREATOR</a>
+            <a href="contact.html">CONTACT</a>
+        </div>
+    </nav>
+
+    <div class="page-content">
+        <h1 class="section-title">Our Games</h1>
+
+        <div class="games-grid">
+            <!-- Game 1 -->
+            <div class="game-card">
+                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80" alt="Level Up Hunter" class="card-img">
+                <div class="card-body">
+                    <span class="card-tag">RPG / ACTION</span>
+                    <h3>Level Up Hunter</h3>
+                    <p>Game aksi RPG berbasis browser dengan kontrol analog joystick. Lawan monster, naik level, dan kumpulkan power-up secara real-time.</p>
+                    <!-- Ganti href dengan link game kamu -->
+                    <a href="https://leveluphunter.netlify.app" target="_blank" class="play-btn">
+                        <i class="fas fa-play"></i> PLAY NOW
+                    </a>
+                </div>
+            </div>
+
+            <!-- Game 2 -->
+            <div class="game-card coming-soon">
+                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80" alt="Cyber Dash" class="card-img">
+                <div class="card-body">
+                    <span class="card-tag">RACING</span>
+                    <h3>Cyber Dash 2099</h3>
+                    <p>Balapan melalui kota futuristik dengan nuansa neon. Hindari rintangan dan raih garis finis sebelum waktu habis.</p>
+                    <a href="#" class="play-btn">COMING SOON</a>
+                </div>
+            </div>
+
+            <!-- Game 3 -->
+            <div class="game-card coming-soon">
+                <img src="https://images.unsplash.com/photo-1614726365723-49faaa5617a9?auto=format&fit=crop&w=600&q=80" alt="Space Void" class="card-img">
+                <div class="card-body">
+                    <span class="card-tag">STRATEGY</span>
+                    <h3>Space Void</h3>
+                    <p>Komando armadamu di luar angkasa. Taklukkan galaksi dan kelola sumber daya dalam game strategi 4X.</p>
+                    <a href="#" class="play-btn">COMING SOON</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>&copy; 2026 Nexus Studios. All rights reserved.</footer>
+</body>
+</html>

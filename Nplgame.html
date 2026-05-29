@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Level Up Hunter - Analog Edition</title>
+    <style>
+        /* RESET & DASAR */
+        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-user-select: none; }
+        body { 
+            background: #0f172a; color: white; font-family: 'Segoe UI', system-ui, sans-serif; 
+            overflow: hidden; width: 100vw; height: 100vh; touch-action: none; 
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        /* JOYSTICK BULAT (ANALOG) */
+        #joystick-container {
+            position: fixed; bottom: 30px; left: 30px;
+            width: 130px; height: 130px;
+            z-index: 100; touch-action: none;
+            display: none; /* Hidden di menu */
+        }
+        .joy-base {
+            width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%; position: relative;
+        }
+        .joy-knob {
+            width: 50px; height: 50px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            pointer-events: none; /* Supaya event tembus ke base */
+            transition: transform 0.05s linear; /* Gerakan halus */
+        }
+
+        /* MENU & UI */
+        #menu {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 9999;
+        }
+        .hidden { display: none !important; }
+
+        h1 { font-size: 2rem; color: #38bdf8; margin-bottom: 15px; text-shadow: 0 0 10px #0ea5e9; }
+        p { color: #94a3b8; margin-bottom: 25px; font-size: 0.9rem; }
+
+        .btn {
+            width: 85%; max-width: 300px; padding: 14px; margin: 8px 0;
+            font-size: 1.1rem; font-weight: bold; border: 2px solid; border-radius: 12px;
+            background: rgba(255,255,255,0.05); color: white; cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn:active { transform: scale(0.96); background: rgba(255,255,255,0.2); }
+        .btn-easy { border-color: #22c55e; color: #22c55e; }
+        .btn-norm { border-color: #eab308; color: #eab308; }
+        .btn-hard { border-color: #ef4444; color: #ef4444; }
+        .score { font-size: 0.75rem; color: #64748b; margin-bottom: 12px; }
+
+        /* HUD GAME */
+        #gameUI {
+            position: absolute; top: 10px; left: 10px;
+            background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 8px;
+            pointer-events: none; display: none;
+        }
+        .stat { font-size: 13px; margin-bottom: 2px; font-weight: 600; }
+        .xp-track { width: 100px; height: 5px; background: #334155; border-radius: 3px; margin-top: 3px; }
+        .xp-fill { height: 100%; background: #4ade80; width: 0%; transition: width 0.2s; }
+
+        /* NOTIFIKASI POWER UP */
+        #buff-indicator {
+            position: absolute; top: 70px; left: 50%; transform: translateX(-50%);
+            background: #eab308; color: black; padding: 5px 12px; border-radius: 20px;
+            font-weight: bold; font-size: 12px; opacity: 0; transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        /* === GAME OVER MODAL STYLES === */
+#game-over-modal {
+    display: none; /* Tersembunyi default */
+    position: absolute; 
+    top: 0; left: 0; 
+    width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.95); /* Latar belakang gelap transparan */
+    backdrop-filter: blur(8px); /* Efek blur di belakang */
+    z-index: 10000; /* Pastikan di atas semua elemen */
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.4s ease;
+}
+
+.modal-card {
+    background: linear-gradient(145deg, #1e293b, #0f172a);
+    border: 2px solid #ef4444; /* Border merah menyala */
+    padding: 25px;
+    border-radius: 16px;
+    text-align: center;
+    width: 85%;
+    max-width: 320px;
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+    animation: popUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.go-title {
+    font-size: 26px;
+    color: #ef4444;
+    margin-bottom: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+.go-stats {
+    background: rgba(0,0,0,0.3);
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.go-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 15px;
+}
+
+.go-row:last-child { margin-bottom: 0; }
+
+.go-label { color: #94a3b8; }
+.go-value { font-weight: bold; color: white; }
+.go-value.score-val { color: #38bdf8; } /* Biru untuk skor */
+.go-value.level-val { color: #4ade80; } /* Hijau untuk level */
+
+.go-new-record {
+    color: #eab308;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 15px;
+    display: none; /* Muncul hanya jika rekor baru */
+    animation: pulse 1.5s infinite;
+}
+
+.go-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.btn-restart {
+    background: linear-gradient(45deg, #22c55e, #16a34a);
+    border: none;
+    color: white;
+    box-shadow: 0 4px 0 #15803d;
+    transition: all 0.1s;
+}
+.btn-restart:active { transform: translateY(4px); box-shadow: none; }
+
+.btn-menu {
+    background: linear-gradient(45deg, #334155, #1e293b);
+    border: 1px solid #475569;
+    color: #cbd5e1;
+    transition: all 0.1s;
+}
+.btn-menu:active { transform: translateY(2px); }
+
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes popUp { from { transform: scale(0.7); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+
+    </style>
+</head>
+<body>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- JOYSTICK ANALOG -->
+    <div id="joystick-container">
+        <div class="joy-base">
+            <div class="joy-knob"></div>
+        </div>
+    </div>
+
+    <!-- HUD -->
+    <div id="gameUI">
+        <div class="stat">Lv.<span id="uiLv">1</span> | ❤️<span id="uiHp">100</span></div>
+        <div class="stat">Skor: <span id="uiSc">0</span></div>
+        <div class="xp-track"><div class="xp-fill" id="uiXp"></div></div>
+    </div>
+    <div id="buff-indicator"> SPEED BOOST! ⚡</div>
+
+<!-- GAME OVER MODAL -->
+<div id="game-over-modal">
+    <div class="modal-card">
+        <h2 class="go-title">GAME OVER</h2>
+        
+        <div class="go-stats">
+            <div class="go-row">
+                <span class="go-label">Skor Akhir</span>
+                <span class="go-value score-val" id="go-score">0</span>
+            </div>
+            <div class="go-row">
+                <span class="go-label">Level Tercapai</span>
+                <span class="go-value level-val" id="go-level">1</span>
+            </div>
+            <div class="go-row">
+                <span class="go-label">Mode</span>
+                <span class="go-value" id="go-mode">-</span>
+            </div>
+        </div>
+
+        <div class="go-new-record" id="go-record">🏆 REKOR BARU!</div>
+        
+        <div class="go-buttons">
+            <button class="btn btn-restart" id="btnRestart">🔄 MAIN LAGI</button>
+            <button class="btn btn-menu" id="btnMainMenu">🏠 MENU UTAMA</button>
+        </div>
+    </div>
+</div>
+
+    <!-- MENU AWAL -->
+    <div id="menu">
+        <h1>LEVEL UP HUNTER</h1>
+        <p>Pilih mode untuk mulai bermain</p>
+        
+        <button class="btn btn-easy" id="btnEasy" ontouchstart="void(0)"> MUDAH</button>
+        <div class="score">Skor Tertinggi: <span id="hs_easy">0</span></div>
+        
+        <button class="btn btn-norm" id="btnNorm" ontouchstart="void(0)"> NORMAL</button>
+        <div class="score">Skor Tertinggi: <span id="hs_norm">0</span></div>
+        
+        <button class="btn btn-hard" id="btnHard" ontouchstart="void(0)">🔴 SULIT</button>
+        <div class="score">Skor Tertinggi: <span id="hs_hard">0</span></div>
+    </div>
+
+    <script>
+        // === 1. SETUP CANVAS ===
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resize); resize();
+
+        // === 2. JOYSTICK LOGIC (ANALOG 360 DERAJAT) ===
+        const joyContainer = document.getElementById('joystick-container');
+        const joyKnob = document.querySelector('.joy-knob');
+        const joyBase = document.querySelector('.joy-base');
+
+        let joystick = { x: 0, y: 0, active: false, touchId: null };
+        const maxRadius = 40; // Jarak maksimal knob bergerak dari tengah
+
+        // Fungsi update posisi knob
+        function updateJoystickVisual(clientX, clientY) {
+            const rect = joyBase.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+
+            let dx = clientX - centerX;
+            let dy = clientY - centerY;
+            let distance = Math.hypot(dx, dy);
+
+            // Jika jarak lebih dari radius, kita kunci di lingkaran (Clamping)
+            if (distance > maxRadius) {
+                const angle = Math.atan2(dy, dx);
+                dx = Math.cos(angle) * maxRadius;
+                dy = Math.sin(angle) * maxRadius;
+            }
+
+            // Update posisi visual knob
+            joyKnob.style.transform = `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+
+            // Update nilai input (-1 sampai 1)
+            joystick.x = dx / maxRadius;
+            joystick.y = dy / maxRadius;
+        }
+
+        function resetJoystick() {
+            joystick.x = 0; joystick.y = 0; joystick.active = false;
+            joyKnob.style.transform = `translate(-50%, -50%)`; // Kembali ke tengah
+        }
+
+        // Event Listeners Joystick
+        joyBase.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            joystick.active = true;
+            joystick.touchId = e.changedTouches[0].identifier;
+            updateJoystickVisual(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        }, { passive: false });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!joystick.active) return;
+            for (let i = 0; i < e.changedTouches.length; i++) {
+                if (e.changedTouches[i].identifier === joystick.touchId) {
+                    e.preventDefault(); // Stop scroll
+                    updateJoystickVisual(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+                    break;
+                }
+            }
+        }, { passive: false });
+
+        window.addEventListener('touchend', (e) => {
+            if (joystick.active) {
+                for (let i = 0; i < e.changedTouches.length; i++) {
+                    if (e.changedTouches[i].identifier === joystick.touchId) {
+                        resetJoystick();
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Mouse Support (untuk testing di PC)
+        let isMouseDown = false;
+        joyBase.addEventListener('mousedown', (e) => {
+            isMouseDown = true; joystick.active = true;
+            updateJoystickVisual(e.clientX, e.clientY);
+        });
+        window.addEventListener('mousemove', (e) => { if(isMouseDown) updateJoystickVisual(e.clientX, e.clientY); });
+        window.addEventListener('mouseup', () => { isMouseDown = false; resetJoystick(); });
+
+        // === 3. GAME STATE & MENU ===
+        const menu = document.getElementById('menu');
+        const gameUI = document.getElementById('gameUI');
+
+        function bindModeButton(id, mode) {
+            const btn = document.getElementById(id);
+            const startHandler = (e) => {
+                e.preventDefault();
+                console.log(`🚀 Starting ${mode} mode...`);
+                menu.classList.add('hidden');
+                gameUI.style.display = 'block';
+                joyContainer.style.display = 'block'; // Tampilkan Joystick
+                initGame(mode);
+            };
+            btn.addEventListener('pointerdown', startHandler);
+        }
+
+        bindModeButton('btnEasy', 'easy');
+        bindModeButton('btnNorm', 'normal');
+        bindModeButton('btnHard', 'hard');
+
+        // Load Highscore
+        ['easy','normal','hard'].forEach(m => {
+            const key = m === 'easy' ? 'easy' : m === 'normal' ? 'norm' : 'hard';
+            document.getElementById(`hs_${key}`).textContent = localStorage.getItem(`hs_${key}`) || '0';
+        });
+
+        // === 4. GAME LOGIC ===
+        let gameRunning = false, score = 0, currentMode = null;
+        let enemies = [], items = [], particles = []; // Array Partikel
+        let spawnTimer = 0, itemTimer = 0, lastDamageTime = 0;
+
+        const MODES = {
+            easy:   { spawnRate: 65, enemySpdMult: 0.75, dmgMult: 0.6, hsKey: 'hs_easy' },
+            normal: { spawnRate: 50, enemySpdMult: 1.0,  dmgMult: 1.0, hsKey: 'hs_norm' },
+            hard:   { spawnRate: 30, enemySpdMult: 1.3,  dmgMult: 1.8, hsKey: 'hs_hard' }
+        };
+
+        const player = { x:0, y:0, r:22, lv:1, hp:100, maxHp:100, spd:4.5, xp:0, xpReq:60, buffEnd:0 };
+
+        // Fungsi Partikel (Nama berbeda dari array 'particles')
+        function createParticles(x, y, col, n = 8) {
+            for(let i = 0; i < n; i++) {
+                particles.push({
+                    x, y,
+                    vx: (Math.random() - 0.5) * 6,
+                    vy: (Math.random() - 0.5) * 6,
+                    life: 1, col
+                });
+            }
+        }
+
+        function initGame(mode) {
+            currentMode = MODES[mode];
+            gameRunning = true; score = 0;
+            enemies = []; items = []; particles = [];
+            spawnTimer = 0; itemTimer = 0;
+            
+            player.x = canvas.width/2; player.y = canvas.height/2;
+            player.lv = 1; player.hp = 100; player.maxHp = 100;
+            player.spd = 4.5; player.xp = 0; player.xpReq = 60; player.buffEnd = 0;
+            
+            updateUI();
+            requestAnimationFrame(loop);
+        }
+
+        function updateUI() {
+            document.getElementById('uiLv').textContent = player.lv;
+            document.getElementById('uiHp').textContent = `${Math.ceil(player.hp)}/${player.maxHp}`;
+            document.getElementById('uiSc').textContent = score;
+            document.getElementById('uiXp').style.width = `${Math.min(100, (player.xp/player.xpReq)*100)}%`;
+            
+            // Indikator Buff
+            const buffEl = document.getElementById('buff-indicator');
+            if(Date.now() < player.buffEnd) {
+                buffEl.style.opacity = 1;
+                buffEl.textContent = `⚡ SPEED ${Math.ceil((player.buffEnd-Date.now())/1000)}s`;
+            } else {
+                buffEl.style.opacity = 0;
+            }
+        }
+
+        function spawnEnemy() {
+            let edge = Math.floor(Math.random()*4);
+            let x = edge===0 ? Math.random()*canvas.width : edge===1 ? canvas.width+40 : edge===2 ? Math.random()*canvas.width : -40;
+            let y = edge===0 ? -40 : edge===1 ? Math.random()*canvas.height : edge===2 ? canvas.height+40 : Math.random()*canvas.height;
+
+            let eLv = (player.lv <= 2 && Math.random() < 0.65) ? 0 : Math.max(0, player.lv + Math.floor(Math.random()*7)-3);
+            let col = eLv===0 ? '#94a3b8' : eLv >= player.lv ? '#ef4444' : '#f97316';
+            
+            enemies.push({ x, y, r: 14+eLv*1.5, lv: eLv, spd: (1.5+eLv*0.15)*currentMode.enemySpdMult, col });
+        }
+
+        function spawnItem() {
+            let x = Math.random()*(canvas.width-100)+50;
+            let y = Math.random()*(canvas.height-100)+50;
+            items.push({ x, y, r: 14, type: 'speed' });
+        }
+
+        function loop() {
+            if(!gameRunning) return;
+            update(); draw(); requestAnimationFrame(loop);
+        }
+
+        function update() {
+            // Movement (Joystick X/Y)
+            let mx = joystick.x;
+            let my = joystick.y;
+            
+            // Keyboard Fallback
+            // (Bisa ditambah di sini jika mau support WASD + Joystick bareng)
+
+            let currentSpd = player.spd;
+            if(Date.now() < player.buffEnd) currentSpd *= 1.8; // Speed boost
+
+            player.x += mx * currentSpd;
+            player.y += my * currentSpd;
+
+            // Batas Layar
+            player.x = Math.max(player.r, Math.min(canvas.width-player.r, player.x));
+            player.y = Math.max(player.r, Math.min(canvas.height-player.r, player.y));
+
+            // Spawn Logic
+            spawnTimer++; itemTimer++;
+            if(spawnTimer >= currentMode.spawnRate) { spawnEnemy(); spawnTimer=0; }
+            if(itemTimer >= 400) { if(items.length < 2) spawnItem(); itemTimer=0; }
+
+            // Logic Musuh
+            for(let i=enemies.length-1;i>=0;i--) {
+                let e = enemies[i];
+                let dx=player.x-e.x, dy=player.y-e.y, dist=Math.hypot(dx,dy);
+                if(dist>0){ e.x+=(dx/dist)*e.spd; e.y+=(dy/dist)*e.spd; }
+
+                if(dist < player.r+e.r) {
+                    if(player.lv > e.lv) {
+                        enemies.splice(i,1); createParticles(e.x,e.y,e.col,8);
+                        score += 10+(e.lv*10); player.xp += 15+(e.lv*15);
+                        if(player.xp >= player.xpReq) {
+                            player.lv++; player.xp=0; player.xpReq=Math.floor(player.xpReq*1.4);
+                            player.maxHp+=25; player.hp=player.maxHp; player.spd+=0.2;
+                            createParticles(player.x,player.y,'#22c55e',20);
+                        }
+                    } else {
+                        if(Date.now()-lastDamageTime > 400) {
+                            player.hp -= 20*currentMode.dmgMult; lastDamageTime = Date.now();
+                            createParticles(player.x,player.y,'#ef4444',5);
+                            // Knockback
+                            player.x += (dx/dist)*20; player.y += (dy/dist)*20;
+                        }
+                    }
+                    updateUI();
+                    if(player.hp<=0) endGame();
+                }
+            }
+
+            // Logic Item
+            for(let i=items.length-1;i>=0;i--) {
+                let it = items[i];
+                if(Math.hypot(player.x-it.x, player.y-it.y) < player.r+it.r) {
+                    if(it.type==='speed') {
+                        player.buffEnd = Date.now() + 5000; // 5 detik
+                        createParticles(it.x,it.y,'#eab308',10);
+                    }
+                    items.splice(i,1);
+                }
+            }
+
+            // Update Partikel
+            for(let i=particles.length-1;i>=0;i--) {
+                let p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.life-=0.04; 
+                p.vx*=0.95; p.vy*=0.95; // Friction
+                if(p.life<=0) particles.splice(i,1);
+            }
+        }
+
+        function endGame() {
+            gameRunning = false;
+            joyContainer.style.display = 'none'; // Sembunyikan Joystick
+            gameUI.style.display = 'none';
+            
+            let hs = parseInt(localStorage.getItem(currentMode.hsKey) || '0');
+            if(score > hs) localStorage.setItem(currentMode.hsKey, score);
+            
+            alert(`Game Over!\nSkor: ${score}\nLevel: ${player.lv}`);
+            location.reload();
+        }
+
+        function draw() {
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            
+            // Grid Background
+            ctx.strokeStyle='#1e293b'; ctx.lineWidth=1;
+            for(let x=0;x<canvas.width;x+=50){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,canvas.height);ctx.stroke();}
+            for(let y=0;y<canvas.height;y+=50){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(canvas.width,y);ctx.stroke();}
+
+            // Items (Power Up)
+            items.forEach(it => {
+                ctx.beginPath(); ctx.arc(it.x,it.y,it.r,0,Math.PI*2);
+                ctx.fillStyle='#eab308'; ctx.fill(); ctx.strokeStyle='white'; ctx.lineWidth=2; ctx.stroke();
+                ctx.fillStyle='black'; ctx.font='bold 14px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText('⚡',it.x,it.y);
+            });
+
+            // Particles
+            particles.forEach(p => { ctx.globalAlpha=p.life; ctx.fillStyle=p.col; ctx.beginPath(); ctx.arc(p.x,p.y,3,0,Math.PI*2); ctx.fill(); });
+            ctx.globalAlpha=1;
+
+            // Enemies
+            enemies.forEach(e => {
+                ctx.beginPath(); ctx.arc(e.x,e.y,e.r,0,Math.PI*2);
+                ctx.fillStyle=e.col; ctx.fill(); ctx.strokeStyle='rgba(255,255,255,0.3)'; ctx.lineWidth=2; ctx.stroke();
+                ctx.fillStyle='white'; ctx.font='bold 12px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+                ctx.fillText(e.lv===0?'Lv.0':`Lv.${e.lv}`, e.x, e.y);
+            });
+
+            // Player
+            ctx.beginPath(); ctx.arc(player.x,player.y,player.r,0,Math.PI*2);
+            ctx.fillStyle='#22c55e'; ctx.fill(); ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.stroke();
+            ctx.fillStyle='white'; ctx.font='bold 14px Arial'; ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(`Lv.${player.lv}`, player.x, player.y);
+        }
+        
+        // --- VARIABEL GLOBAL YANG DIPERLUKAN ---
+// Pastikan Anda memiliki variabel ini di scope global atau sesuai struktur game Anda:
+// let currentMode = { name: 'Normal', hsKey: 'hs_norm' }; // Contoh objek mode
+// let score = 0;
+// let player = { lv: 1 };
+
+const gameOverModal = document.getElementById('game-over-modal');
+const goScoreEl = document.getElementById('go-score');
+const goLevelEl = document.getElementById('go-level');
+const goModeEl = document.getElementById('go-mode');
+const goRecordEl = document.getElementById('go-record');
+
+// --- FUNGSI END GAME YANG BARU ---
+function endGame() {
+    gameRunning = false; // Hentikan loop game
+    
+    // 1. Cek dan Simpan Highscore
+    let hs = parseInt(localStorage.getItem(currentMode.hsKey) || '0');
+    let isNewRecord = score > hs;
+    
+    if (isNewRecord) {
+        localStorage.setItem(currentMode.hsKey, score);
+        goRecordEl.style.display = 'block'; // Tampilkan "Rekor Baru"
+    } else {
+        goRecordEl.style.display = 'none';
+    }
+    
+    // 2. Isi Data ke Modal
+    goScoreEl.textContent = score;
+    goLevelEl.textContent = player.lv;
+    goModeEl.textContent = currentMode.name; // Pastikan currentMode punya properti 'name'
+    
+    // 3. Sembunyikan Elemen Game
+    joyContainer.style.display = 'none';
+    gameUI.style.display = 'none';
+    
+    // 4. Tampilkan Modal Game Over
+    gameOverModal.style.display = 'flex';
+}
+
+// --- EVENT LISTENER UNTUK TOMBOL ---
+
+// Tombol Main Lagi
+document.getElementById('btnRestart').addEventListener('click', (e) => {
+    e.preventDefault();
+    restartGame();
+});
+
+// Tombol Menu Utama
+document.getElementById('btnMainMenu').addEventListener('click', (e) => {
+    e.preventDefault();
+    goToMainMenu();
+});
+
+// --- FUNGSI RESTART & MENU ---
+
+function restartGame() {
+    // Reset variabel game
+    score = 0;
+    player.lv = 1;
+    player.hp = player.maxHp;
+    player.xp = 0;
+    enemies = [];
+    items = [];
+    particles = [];
+    
+    // Reset posisi player
+    player.x = canvas.width / 2;
+    player.y = canvas.height / 2;
+    
+    // Sembunyikan modal
+    gameOverModal.style.display = 'none';
+    
+    // Tampilkan UI game kembali
+    joyContainer.style.display = 'block';
+    gameUI.style.display = 'block';
+    
+    // Mulai ulang loop
+    gameRunning = true;
+    updateUI();
+    requestAnimationFrame(loop);
+}
+
+function goToMainMenu() {
+    // Sembunyikan modal dan UI game
+    gameOverModal.style.display = 'none';
+    joyContainer.style.display = 'none';
+    gameUI.style.display = 'none';
+    
+    // Tampilkan menu utama
+    const menu = document.getElementById('menu');
+    menu.classList.remove('hidden');
+    
+    // Update tampilan highscore di menu (opsional)
+    ['easy','norm','hard'].forEach(m => {
+        const key = m === 'easy' ? 'easy' : m === 'normal' ? 'norm' : 'hard';
+        const el = document.getElementById(`hs_${key}`);
+        if(el) el.textContent = localStorage.getItem(`hs_${key}`) || '0';
+    });
+}
+
+    </script>
+    
+</body>
+</html>

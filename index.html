@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEXUS STUDIOS | Home</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --primary: #00f3ff;
+            --secondary: #7000ff;
+            --text-main: #ffffff;
+            --text-muted: #8b9bb4;
+            --gradient: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-dark); color: var(--text-main);
+            font-family: 'Rajdhani', sans-serif; overflow: hidden;
+        }
+        h1, h2, h3 { font-family: 'Orbitron', sans-serif; text-transform: uppercase; }
+
+        /* Background */
+        .bg-grid {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(0,243,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,243,255,0.03) 1px, transparent 1px);
+            background-size: 60px 60px; z-index: -1;
+            mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
+        }
+
+        /* Navbar */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 5%; position: fixed; width: 100%; top: 0;
+            background: rgba(5,5,5,0.85); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 100;
+        }
+        .logo { font-size: 1.4rem; font-weight: 900; letter-spacing: 2px; cursor: pointer; }
+        .logo span { color: var(--primary); }
+        .nav-links { display: flex; gap: 25px; }
+        .nav-links a {
+            color: var(--text-muted); font-weight: 600; font-size: 1rem;
+            padding: 5px 10px; border-radius: 4px; transition: 0.3s;
+        }
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--primary); text-shadow: 0 0 10px var(--primary);
+        }
+
+        /* Hero */
+        .hero {
+            height: 100vh; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            padding: 0 20px;
+        }
+        .hero h1 {
+            font-size: 4.5rem; line-height: 1.1; margin-bottom: 20px;
+            background: linear-gradient(to right, #fff, var(--text-muted));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .hero h1 span {
+            background: var(--gradient); -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero p {
+            font-size: 1.2rem; color: var(--text-muted); max-width: 600px;
+            margin-bottom: 50px;
+        }
+
+        /* Navigation Buttons */
+        .nav-buttons { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+        .nav-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            width: 180px; height: 180px; border-radius: 16px;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08);
+            cursor: pointer; transition: all 0.4s ease; text-decoration: none; color: white;
+            position: relative; overflow: hidden;
+        }
+        .nav-btn::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,243,255,0.1), transparent);
+            transition: 0.5s;
+        }
+        .nav-btn:hover::before { left: 100%; }
+        .nav-btn:hover {
+            border-color: var(--primary); transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0,243,255,0.15);
+        }
+        .nav-btn i { font-size: 2.5rem; margin-bottom: 12px; color: var(--primary); }
+        .nav-btn span { font-family: 'Orbitron', sans-serif; font-weight: 700; font-size: 1rem; letter-spacing: 1px; }
+        .nav-btn p { font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; }
+
+        /* Footer */
+        footer {
+            position: fixed; bottom: 0; width: 100%; padding: 15px;
+            text-align: center; color: #333; font-size: 0.8rem;
+            background: rgba(5,5,5,0.9); border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2rem; }
+            .nav-buttons { gap: 15px; }
+            .nav-btn { width: 140px; height: 140px; }
+            .nav-btn i { font-size: 2rem; }
+            .nav-links { gap: 10px; }
+            .nav-links a { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <nav>
+        <div class="logo" onclick="window.location='index.html'">NEXUS <span>STUDIOS</span></div>
+        <div class="nav-links">
+            <a href="index.html" class="active">HOME</a>
+            <a href="games.html">GAMES</a>
+            <a href="creator.html">CREATOR</a>
+            <a href="contact.html">CONTACT</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>WE BUILD <span>WORLDS</span><br>YOU LOVE TO PLAY</h1>
+        <p>Indie game studio specializing in browser-based RPGs and action titles.</p>
+
+        <div class="nav-buttons">
+            <a href="games.html" class="nav-btn">
+                <i class="fas fa-gamepad"></i>
+                <span>GAMES</span>
+                <p>Semua Game Kami</p>
+            </a>
+            <a href="creator.html" class="nav-btn">
+                <i class="fas fa-user-astronaut"></i>
+                <span>CREATOR</span>
+                <p>Tentang Pembuat</p>
+            </a>
+            <a href="contact.html" class="nav-btn">
+                <i class="fas fa-envelope"></i>
+                <span>CONTACT</span>
+                <p>Hubungi Kami</p>
+            </a>
+        </div>
+    </section>
+
+    <footer>&copy; 2026 Nexus Studios. All rights reserved.</footer>
+</body>
+</html>
